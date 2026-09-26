@@ -1,335 +1,656 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tickets & Visit | Retrotopia</title>
-<meta name="description" content="Buy Retrotopia tickets, check opening hours, and plan your visit." />
-<link rel="shortcut icon" href="logo.jpeg" type="image/x-icon" />
-<link rel="stylesheet" href="css/theme.css" />
-<style>
-  .ticket-layout{display:grid;grid-template-columns:1.5fr 1fr;gap:clamp(28px,5vw,48px);align-items:start;}
-  @media (max-width:960px){ .ticket-layout{grid-template-columns:1fr;} }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tickets & Visit | Retrotopia</title>
+    <meta
+      name="description"
+      content="Buy Retrotopia tickets, check opening hours, and plan your visit."
+    />
+    <link rel="shortcut icon" href="logo.jpeg" type="image/x-icon" />
+    <link rel="stylesheet" href="css/theme.css" />
+    <script>
+      /* Apply saved theme before first paint to avoid a flash of the wrong theme */
+      document.documentElement.setAttribute(
+        "data-theme",
+        localStorage.getItem("retrotopia-theme") || "dark",
+      );
+    </script>
+    <style>
+      .ticket-layout {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        gap: clamp(28px, 5vw, 48px);
+        align-items: start;
+      }
+      @media (max-width: 960px) {
+        .ticket-layout {
+          grid-template-columns: 1fr;
+        }
+      }
 
-  .ticket-row{
-    display:flex;align-items:center;justify-content:space-between;gap:16px;
-    padding:20px 0;border-bottom:1px solid var(--border);
-  }
-  .ticket-row:first-child{padding-top:0;}
-  .ticket-row h4{font-size:1.05rem;color:var(--ivory-100);font-family:var(--font-display);font-weight:600;}
-  .ticket-row .desc{color:var(--text-muted);font-size:.86rem;margin-top:4px;max-width:36ch;}
-  .ticket-price{font-weight:700;color:var(--accent-strong);white-space:nowrap;min-width:64px;text-align:right;}
-  .qty-control{display:flex;align-items:center;gap:10px;}
-  .qty-control button{
-    width:32px;height:32px;border-radius:50%;border:1px solid var(--border);
-    background:var(--navy-900);color:var(--ivory-100);font-size:1rem;line-height:1;
-  }
-  .qty-control button:hover{border-color:var(--accent-strong);color:var(--accent-strong);}
-  .qty-control input{
-    width:34px;text-align:center;background:none;border:0;color:var(--ivory-100);font-weight:700;font-size:1rem;
-  }
-  .ticket-summary{
-    display:flex;align-items:center;justify-content:space-between;
-    margin-top:24px;padding-top:22px;border-top:1px solid var(--border);
-  }
-  .ticket-summary .total{font-family:var(--font-display);font-size:1.6rem;color:var(--accent-strong);}
+      .ticket-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 20px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .ticket-row:first-child {
+        padding-top: 0;
+      }
+      .ticket-row h4 {
+        font-size: 1.05rem;
+        color: var(--ivory-100);
+        font-family: var(--font-display);
+        font-weight: 600;
+      }
+      .ticket-row .desc {
+        color: var(--text-muted);
+        font-size: 0.86rem;
+        margin-top: 4px;
+        max-width: 36ch;
+      }
+      .ticket-price {
+        font-weight: 700;
+        color: var(--accent-strong);
+        white-space: nowrap;
+        min-width: 64px;
+        text-align: right;
+      }
+      .qty-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .qty-control button {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 1px solid var(--border);
+        background: var(--navy-900);
+        color: var(--ivory-100);
+        font-size: 1rem;
+        line-height: 1;
+      }
+      .qty-control button:hover {
+        border-color: var(--accent-strong);
+        color: var(--accent-strong);
+      }
+      .qty-control input {
+        width: 34px;
+        text-align: center;
+        background: none;
+        border: 0;
+        color: var(--ivory-100);
+        font-weight: 700;
+        font-size: 1rem;
+      }
+      .ticket-summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 24px;
+        padding-top: 22px;
+        border-top: 1px solid var(--border);
+      }
+      .ticket-summary .total {
+        font-family: var(--font-display);
+        font-size: 1.6rem;
+        color: var(--accent-strong);
+      }
 
-  .info-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-md);padding:28px;}
-  .info-card + .info-card{margin-top:22px;}
-  .info-card h3{font-size:1.1rem;margin-bottom:14px;}
-  .hours-table{width:100%;border-collapse:collapse;font-size:.9rem;}
-  .hours-table tr{border-bottom:1px solid var(--border);}
-  .hours-table tr:last-child{border-bottom:0;}
-  .hours-table td{padding:9px 0;color:var(--text-muted);}
-  .hours-table td:last-child{text-align:right;color:var(--ivory-100);font-weight:600;}
-  .map-art{
-    height:150px;border-radius:var(--radius-sm);margin-bottom:18px;
-    background:
-      radial-gradient(circle at 30% 30%, rgba(227,165,63,.35), transparent 55%),
-      repeating-linear-gradient(45deg, rgba(255,255,255,.05) 0 2px, transparent 2px 26px),
-      linear-gradient(135deg,var(--navy-800),var(--navy-950));
-    border:1px solid var(--border);
-    position:relative;
-    overflow:hidden;
-  }
-  .map-art::after{
-    content:"📍";position:absolute;left:50%;top:50%;transform:translate(-50%,-60%);font-size:1.6rem;
-  }
+      .info-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 28px;
+      }
+      .info-card + .info-card {
+        margin-top: 22px;
+      }
+      .info-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 14px;
+      }
+      .hours-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+      }
+      .hours-table tr {
+        border-bottom: 1px solid var(--border);
+      }
+      .hours-table tr:last-child {
+        border-bottom: 0;
+      }
+      .hours-table td {
+        padding: 9px 0;
+        color: var(--text-muted);
+      }
+      .hours-table td:last-child {
+        text-align: right;
+        color: var(--ivory-100);
+        font-weight: 600;
+      }
 
-  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
-  @media (max-width:820px){ .steps{grid-template-columns:1fr;} }
-  .step-card{padding:26px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--navy-900);}
-  .step-num{
-    width:36px;height:36px;border-radius:50%;background:var(--gold-500);color:var(--navy-950);
-    display:flex;align-items:center;justify-content:center;font-weight:800;font-family:var(--font-display);margin-bottom:14px;
-  }
-  .step-card h4{font-size:1.02rem;margin-bottom:8px;}
-  .step-card p{color:var(--text-muted);font-size:.9rem;}
+      /* real embedded Google Map (replaces the old CSS placeholder) */
+      .map-embed {
+        height: 150px;
+        border-radius: var(--radius-sm);
+        margin-bottom: 18px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+      }
+      .map-embed iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+        display: block;
+        filter: saturate(0.9);
+      }
 
-  .faq-item{border-bottom:1px solid var(--border);}
-  .faq-item summary{
-    list-style:none;padding:18px 4px;display:flex;justify-content:space-between;align-items:center;
-    cursor:pointer;font-weight:600;color:var(--ivory-100);
-  }
-  .faq-item summary::-webkit-details-marker{display:none;}
-  .faq-item summary::after{content:"+";font-size:1.3rem;color:var(--accent-strong);}
-  .faq-item[open] summary::after{content:"–";}
-  .faq-item p{padding:0 4px 20px;color:var(--text-muted);max-width:70ch;}
-</style>
-</head>
-<body>
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+      }
+      @media (max-width: 820px) {
+        .steps {
+          grid-template-columns: 1fr;
+        }
+      }
+      .step-card {
+        padding: 26px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--navy-900);
+      }
+      .step-num {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--gold-500);
+        color: var(--on-accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-family: var(--font-display);
+        margin-bottom: 14px;
+      }
+      .step-card h4 {
+        font-size: 1.02rem;
+        margin-bottom: 8px;
+      }
+      .step-card p {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
 
-<header class="site-header">
-  <div class="container">
-    <a href="index.html" class="brand">
-      <img src="logo.jpeg" alt="Retrotopia logo" />
-      <span class="brand-word">Retro<em>topia</em></span>
-    </a>
-    <nav class="main-nav" id="main-nav">
-      <a href="index.html">Home</a>
-      <a href="gallery.html">Gallery</a>
-      <a href="tickets.html">Tickets &amp; Visit</a>
-      <a href="artandstories.html">Art &amp; Stories</a>
-      <a href="contactus.html">Contact Us</a>
-    </nav>
-    <div class="header-actions">
-      <details class="lang-select">
-        <summary>Language | <strong>ENG</strong> <span class="chev">▾</span></summary>
-        <div class="lang-menu">
-          <button data-code="ENG"><img src="Languages/USA.png" alt="">English</button>
-          <button data-code="FRA"><img src="Languages/France.webp" alt="">Français</button>
-          <button data-code="DEU"><img src="Languages/Germany.png" alt="">Deutsch</button>
-          <button data-code="ESP"><img src="Languages/Spain.webp" alt="">Español</button>
-        </div>
-      </details>
-      <button class="switch" data-mode-toggle aria-pressed="false" aria-label="Toggle high-contrast display mode"></button>
-      <a href="tickets.html" class="btn btn-primary" style="padding:10px 22px;">Buy Tickets</a>
-      <button class="nav-toggle" aria-expanded="false" aria-label="Menu"><span></span><span></span><span></span></button>
-    </div>
-  </div>
-</header>
-
-<main>
-  <section class="page-banner">
-    <div class="container">
-      <span class="eyebrow">Tickets &amp; visit</span>
-      <h1>Plan your visit to Retrotopia</h1>
-      <p>Timed tickets keep every hall comfortable. Choose your admission below, or scroll down for hours, location, and answers to common questions.</p>
-      <div class="crumb"><a href="index.html">Home</a> / Tickets &amp; Visit</div>
-    </div>
-  </section>
-
-  <!-- ============ TICKETS ============ -->
-  <section class="section">
-    <div class="container">
-      <div class="ticket-layout">
-
-        <div class="reveal">
-          <div class="section-head" style="margin-bottom:28px;">
-            <span class="eyebrow">Admission</span>
-            <h2>Choose your tickets</h2>
-          </div>
-
-          <form data-ticket-form>
-            <div class="ticket-row" data-ticket-row data-price="18">
-              <div>
-                <h4>General Admission</h4>
-                <p class="desc">Full access to all permanent and ongoing exhibitions.</p>
-              </div>
-              <span class="ticket-price">$18</span>
-              <div class="qty-control">
-                <button type="button" data-step="down" aria-label="Decrease">–</button>
-                <input type="text" value="1" readonly aria-label="Quantity" />
-                <button type="button" data-step="up" aria-label="Increase">+</button>
-              </div>
-            </div>
-
-            <div class="ticket-row" data-ticket-row data-price="12">
-              <div>
-                <h4>Student / Senior</h4>
-                <p class="desc">Valid student or senior ID required at entry.</p>
-              </div>
-              <span class="ticket-price">$12</span>
-              <div class="qty-control">
-                <button type="button" data-step="down" aria-label="Decrease">–</button>
-                <input type="text" value="0" readonly aria-label="Quantity" />
-                <button type="button" data-step="up" aria-label="Increase">+</button>
-              </div>
-            </div>
-
-            <div class="ticket-row" data-ticket-row data-price="0">
-              <div>
-                <h4>Child (under 12)</h4>
-                <p class="desc">Free entry, must be accompanied by an adult.</p>
-              </div>
-              <span class="ticket-price">Free</span>
-              <div class="qty-control">
-                <button type="button" data-step="down" aria-label="Decrease">–</button>
-                <input type="text" value="0" readonly aria-label="Quantity" />
-                <button type="button" data-step="up" aria-label="Increase">+</button>
-              </div>
-            </div>
-
-            <div class="ticket-row" data-ticket-row data-price="45">
-              <div>
-                <h4>Family Pass</h4>
-                <p class="desc">2 adults + up to 2 children, our best value option.</p>
-              </div>
-              <span class="ticket-price">$45</span>
-              <div class="qty-control">
-                <button type="button" data-step="down" aria-label="Decrease">–</button>
-                <input type="text" value="0" readonly aria-label="Quantity" />
-                <button type="button" data-step="up" aria-label="Increase">+</button>
-              </div>
-            </div>
-
-            <div class="ticket-summary">
-              <span style="color:var(--text-muted);font-weight:600;">Estimated total</span>
-              <span class="total" data-ticket-total>$18.00</span>
-            </div>
-
-            <button type="button" class="btn btn-primary btn-block" style="margin-top:22px;" onclick="alert('This is a demo checkout — hook this up to your ticketing provider.')">Continue to checkout</button>
-          </form>
-        </div>
-
-        <aside id="hours" class="reveal">
-          <div class="info-card">
-            <div class="map-art" aria-hidden="true"></div>
-            <h3>Find us</h3>
-            <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:14px;">Pragati Maidan Complex, Bhairon Marg, New Delhi 110001</p>
-            <table class="hours-table">
-              <tr><td>Monday</td><td>Closed</td></tr>
-              <tr><td>Tuesday – Friday</td><td>10 AM – 6 PM</td></tr>
-              <tr><td>Saturday</td><td>10 AM – 11 PM</td></tr>
-              <tr><td>Sunday</td><td>10 AM – 8 PM</td></tr>
-            </table>
-          </div>
-          <div class="info-card">
-            <h3>Good to know</h3>
-            <table class="hours-table">
-              <tr><td>Last entry</td><td>60 min before close</td></tr>
-              <tr><td>Cloakroom</td><td>Free</td></tr>
-              <tr><td>Accessibility</td><td>Full wheelchair access</td></tr>
-              <tr><td>Photography</td><td>Allowed, no flash</td></tr>
-            </table>
-          </div>
-        </aside>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ PLAN YOUR VISIT ============ -->
-  <section class="section alt">
-    <div class="container">
-      <div class="section-head">
-        <span class="eyebrow">Before you arrive</span>
-        <h2>Three steps to a smooth visit</h2>
-      </div>
-      <div class="steps">
-        <div class="step-card reveal">
-          <div class="step-num">1</div>
-          <h4>Book a time slot</h4>
-          <p>Choose your tickets and arrival window above — entry is timed to avoid crowding.</p>
-        </div>
-        <div class="step-card reveal">
-          <div class="step-num">2</div>
-          <h4>Arrive with your pass</h4>
-          <p>Show your digital ticket at the gate — no printing required.</p>
-        </div>
-        <div class="step-card reveal">
-          <div class="step-num">3</div>
-          <h4>Follow the route</h4>
-          <p>Signage guides you through each hall in the recommended order, or explore freely.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ FAQ ============ -->
-  <section class="section" id="faq">
-    <div class="container" style="max-width:820px;">
-      <div class="section-head">
-        <span class="eyebrow">Common questions</span>
-        <h2>Frequently asked questions</h2>
-      </div>
-
-      <details class="faq-item" open>
-        <summary>Can I reschedule my ticket?</summary>
-        <p>Yes — tickets can be moved to another date up to 24 hours before your original visit, free of charge, from your confirmation email.</p>
-      </details>
-      <details class="faq-item">
-        <summary>Is there parking on site?</summary>
-        <p>Paid parking is available at the Pragati Maidan Complex, a short walk from the main entrance.</p>
-      </details>
-      <details class="faq-item">
-        <summary>Are bags allowed inside?</summary>
-        <p>Small bags are welcome. Larger bags and backpacks can be left at our free cloakroom near the entrance.</p>
-      </details>
-      <details class="faq-item">
-        <summary>Do you offer guided tours?</summary>
-        <p>Guided tours run on the hour during weekend opening times and are included with general admission.</p>
-      </details>
-    </div>
-  </section>
-</main>
-
-<a href="contactus.html" class="floating-btn" style="
-  position:fixed;bottom:24px;right:24px;z-index:90;
-  background:linear-gradient(135deg,var(--gold-400),var(--gold-600));
-  color:var(--navy-950);font-weight:700;font-size:.9rem;
-  padding:14px 26px;border-radius:999px;box-shadow:var(--shadow-gold);">Get in Touch</a>
-<button class="to-top" aria-label="Back to top">↑</button>
-
-<footer class="site-footer">
-  <div class="container">
-    <div class="footer-top">
-      <div class="footer-brand">
+      .faq-item {
+        border-bottom: 1px solid var(--border);
+      }
+      .faq-item summary {
+        list-style: none;
+        padding: 18px 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-weight: 600;
+        color: var(--ivory-100);
+      }
+      .faq-item summary::-webkit-details-marker {
+        display: none;
+      }
+      .faq-item summary::after {
+        content: "+";
+        font-size: 1.3rem;
+        color: var(--accent-strong);
+      }
+      .faq-item[open] summary::after {
+        content: "–";
+      }
+      .faq-item p {
+        padding: 0 4px 20px;
+        color: var(--text-muted);
+        max-width: 70ch;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
         <a href="index.html" class="brand">
           <img src="logo.jpeg" alt="Retrotopia logo" />
           <span class="brand-word">Retro<em>topia</em></span>
         </a>
-        <p>A museum where futuristic vision meets timeless art — exhibitions, artisans, and stories worth the visit.</p>
+        <nav class="main-nav" id="main-nav">
+          <a href="index.html">Home</a>
+          <a href="gallery.html">Gallery</a>
+          <a href="tickets.html">Tickets &amp; Visit</a>
+          <a href="artandstories.html">Art &amp; Stories</a>
+          <a href="contactus.html">Contact Us</a>
+        </nav>
+        <div class="header-actions">
+          <details class="lang-select">
+            <summary>
+              Language | <strong>ENG</strong> <span class="chev">▾</span>
+            </summary>
+            <div class="lang-menu">
+              <button data-code="ENG">
+                <img src="Languages/USA.png" alt="" />English
+              </button>
+              <button data-code="FRA">
+                <img src="Languages/France.webp" alt="" />Français
+              </button>
+              <button data-code="DEU">
+                <img src="Languages/Germany.png" alt="" />Deutsch
+              </button>
+              <button data-code="ESP">
+                <img src="Languages/Spain.webp" alt="" />Español
+              </button>
+            </div>
+          </details>
+          <button
+            class="switch"
+            data-mode-toggle
+            aria-pressed="false"
+            aria-label="Toggle light and dark mode"
+          ></button>
+          <a
+            href="tickets.html"
+            class="btn btn-primary"
+            style="padding: 10px 22px"
+            >Buy Tickets</a
+          >
+          <button class="nav-toggle" aria-expanded="false" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
       </div>
-      <div class="footer-col">
-        <h4>Explore</h4>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="gallery.html">Gallery</a></li>
-          <li><a href="tickets.html">Tickets &amp; Visit</a></li>
-          <li><a href="artandstories.html">Art &amp; Stories</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Visit</h4>
-        <ul>
-          <li><a href="tickets.html">Plan your visit</a></li>
-          <li><a href="tickets.html#hours">Hours &amp; location</a></li>
-          <li><a href="contactus.html">Contact us</a></li>
-          <li><a href="tickets.html#faq">FAQs</a></li>
-        </ul>
-      </div>
-      <div class="footer-col">
-        <h4>Connect</h4>
-        <ul>
-          <li><a href="#!">Facebook — retrotopia_official_fb</a></li>
-          <li><a href="#!">Instagram — retrotopia@official</a></li>
-          <li><a href="#!">Twitter — retrotopia_official</a></li>
-          <li><a href="#!">LinkedIn — retrotopia-official</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <span>© <span data-year></span> Retrotopia Museum. All rights reserved.</span>
-      <div class="social-row">
-        <a href="#!" aria-label="Facebook">f</a>
-        <a href="#!" aria-label="Instagram">ig</a>
-        <a href="#!" aria-label="Twitter">tw</a>
-        <a href="#!" aria-label="LinkedIn">in</a>
-      </div>
-    </div>
-  </div>
-</footer>
+    </header>
 
-<script src="js/main.js"></script>
-</body>
+    <main>
+      <section class="page-banner">
+        <div class="container">
+          <span class="eyebrow">Tickets &amp; visit</span>
+          <h1>Plan your visit to Retrotopia</h1>
+          <p>
+            Timed tickets keep every hall comfortable. Choose your admission
+            below, or scroll down for hours, location, and answers to common
+            questions.
+          </p>
+          <div class="crumb">
+            <a href="index.html">Home</a> / Tickets &amp; Visit
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ TICKETS ============ -->
+      <section class="section">
+        <div class="container">
+          <div class="ticket-layout">
+            <div class="reveal">
+              <div class="section-head" style="margin-bottom: 28px">
+                <span class="eyebrow">Admission</span>
+                <h2>Choose your tickets</h2>
+              </div>
+
+              <form data-ticket-form>
+                <div class="ticket-row" data-ticket-row data-price="18">
+                  <div>
+                    <h4>General Admission</h4>
+                    <p class="desc">
+                      Full access to all permanent and ongoing exhibitions.
+                    </p>
+                  </div>
+                  <span class="ticket-price">$18</span>
+                  <div class="qty-control">
+                    <button
+                      type="button"
+                      data-step="down"
+                      aria-label="Decrease"
+                    >
+                      –
+                    </button>
+                    <input
+                      type="text"
+                      value="1"
+                      readonly
+                      aria-label="Quantity"
+                    />
+                    <button type="button" data-step="up" aria-label="Increase">
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div class="ticket-row" data-ticket-row data-price="12">
+                  <div>
+                    <h4>Student / Senior</h4>
+                    <p class="desc">
+                      Valid student or senior ID required at entry.
+                    </p>
+                  </div>
+                  <span class="ticket-price">$12</span>
+                  <div class="qty-control">
+                    <button
+                      type="button"
+                      data-step="down"
+                      aria-label="Decrease"
+                    >
+                      –
+                    </button>
+                    <input
+                      type="text"
+                      value="0"
+                      readonly
+                      aria-label="Quantity"
+                    />
+                    <button type="button" data-step="up" aria-label="Increase">
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div class="ticket-row" data-ticket-row data-price="0">
+                  <div>
+                    <h4>Child (under 12)</h4>
+                    <p class="desc">
+                      Free entry, must be accompanied by an adult.
+                    </p>
+                  </div>
+                  <span class="ticket-price">Free</span>
+                  <div class="qty-control">
+                    <button
+                      type="button"
+                      data-step="down"
+                      aria-label="Decrease"
+                    >
+                      –
+                    </button>
+                    <input
+                      type="text"
+                      value="0"
+                      readonly
+                      aria-label="Quantity"
+                    />
+                    <button type="button" data-step="up" aria-label="Increase">
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div class="ticket-row" data-ticket-row data-price="45">
+                  <div>
+                    <h4>Family Pass</h4>
+                    <p class="desc">
+                      2 adults + up to 2 children, our best value option.
+                    </p>
+                  </div>
+                  <span class="ticket-price">$45</span>
+                  <div class="qty-control">
+                    <button
+                      type="button"
+                      data-step="down"
+                      aria-label="Decrease"
+                    >
+                      –
+                    </button>
+                    <input
+                      type="text"
+                      value="0"
+                      readonly
+                      aria-label="Quantity"
+                    />
+                    <button type="button" data-step="up" aria-label="Increase">
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <div class="ticket-summary">
+                  <span style="color: var(--text-muted); font-weight: 600"
+                    >Estimated total</span
+                  >
+                  <span class="total" data-ticket-total>$18.00</span>
+                </div>
+
+                <button
+                  type="button"
+                  class="btn btn-primary btn-block"
+                  style="margin-top: 22px"
+                  onclick="
+                    alert(
+                      'This is a demo checkout, hook this up to your ticketing provider.',
+                    )
+                  "
+                >
+                  Continue to checkout
+                </button>
+              </form>
+            </div>
+
+            <aside id="hours" class="reveal">
+              <div class="info-card">
+                <div class="map-embed">
+                  <iframe
+                    src="https://www.google.com/maps?q=Pragati+Maidan+Complex,+Bhairon+Marg,+New+Delhi+110001&output=embed"
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    allowfullscreen
+                    title="Retrotopia Museum location on Google Maps"
+                  >
+                  </iframe>
+                </div>
+                <h3>Find us</h3>
+                <p
+                  style="
+                    color: var(--text-muted);
+                    font-size: 0.9rem;
+                    margin-bottom: 14px;
+                  "
+                >
+                  Pragati Maidan Complex, Bhairon Marg, New Delhi 110001
+                </p>
+                <table class="hours-table">
+                  <tr>
+                    <td>Monday</td>
+                    <td>Closed</td>
+                  </tr>
+                  <tr>
+                    <td>Tuesday – Friday</td>
+                    <td>10 AM – 6 PM</td>
+                  </tr>
+                  <tr>
+                    <td>Saturday</td>
+                    <td>10 AM – 11 PM</td>
+                  </tr>
+                  <tr>
+                    <td>Sunday</td>
+                    <td>10 AM – 8 PM</td>
+                  </tr>
+                </table>
+              </div>
+              <div class="info-card">
+                <h3>Good to know</h3>
+                <table class="hours-table">
+                  <tr>
+                    <td>Last entry</td>
+                    <td>60 min before close</td>
+                  </tr>
+                  <tr>
+                    <td>Cloakroom</td>
+                    <td>Free</td>
+                  </tr>
+                  <tr>
+                    <td>Accessibility</td>
+                    <td>Full wheelchair access</td>
+                  </tr>
+                  <tr>
+                    <td>Photography</td>
+                    <td>Allowed, no flash</td>
+                  </tr>
+                </table>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ PLAN YOUR VISIT ============ -->
+      <section class="section alt">
+        <div class="container">
+          <div class="section-head">
+            <span class="eyebrow">Before you arrive</span>
+            <h2>Three steps to a smooth visit</h2>
+          </div>
+          <div class="steps">
+            <div class="step-card reveal">
+              <div class="step-num">1</div>
+              <h4>Book a time slot</h4>
+              <p>
+                Choose your tickets and arrival window above, entry is timed to
+                avoid crowding.
+              </p>
+            </div>
+            <div class="step-card reveal">
+              <div class="step-num">2</div>
+              <h4>Arrive with your pass</h4>
+              <p>Show your digital ticket at the gate, no printing required.</p>
+            </div>
+            <div class="step-card reveal">
+              <div class="step-num">3</div>
+              <h4>Follow the route</h4>
+              <p>
+                Signage guides you through each hall in the recommended order,
+                or explore freely.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ FAQ ============ -->
+      <section class="section" id="faq">
+        <div class="container" style="max-width: 820px">
+          <div class="section-head">
+            <span class="eyebrow">Common questions</span>
+            <h2>Frequently asked questions</h2>
+          </div>
+
+          <details class="faq-item" open>
+            <summary>Can I reschedule my ticket?</summary>
+            <p>
+              Yes, tickets can be moved to another date up to 24 hours before
+              your original visit, free of charge, from your confirmation email.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>Is there parking on site?</summary>
+            <p>
+              Paid parking is available at the Pragati Maidan Complex, a short
+              walk from the main entrance.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>Are bags allowed inside?</summary>
+            <p>
+              Small bags are welcome. Larger bags and backpacks can be left at
+              our free cloakroom near the entrance.
+            </p>
+          </details>
+          <details class="faq-item">
+            <summary>Do you offer guided tours?</summary>
+            <p>
+              Guided tours run on the hour during weekend opening times and are
+              included with general admission.
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <a
+      href="contactus.html"
+      class="floating-btn"
+      style="
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 90;
+        background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
+        color: var(--on-accent);
+        font-weight: 700;
+        font-size: 0.9rem;
+        padding: 14px 26px;
+        border-radius: 999px;
+        box-shadow: var(--shadow-gold);
+      "
+      >Get in Touch</a
+    >
+    <button class="to-top" aria-label="Back to top">↑</button>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <a href="index.html" class="brand">
+              <img src="logo.jpeg" alt="Retrotopia logo" />
+              <span class="brand-word">Retro<em>topia</em></span>
+            </a>
+            <p>
+              A museum where futuristic vision meets timeless art: exhibitions,
+              artisans, and stories worth the visit.
+            </p>
+          </div>
+          <div class="footer-col">
+            <h4>Explore</h4>
+            <ul>
+              <li><a href="index.html">Home</a></li>
+              <li><a href="gallery.html">Gallery</a></li>
+              <li><a href="tickets.html">Tickets &amp; Visit</a></li>
+              <li><a href="artandstories.html">Art &amp; Stories</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Visit</h4>
+            <ul>
+              <li><a href="tickets.html">Plan your visit</a></li>
+              <li><a href="tickets.html#hours">Hours &amp; location</a></li>
+              <li><a href="contactus.html">Contact us</a></li>
+              <li><a href="tickets.html#faq">FAQs</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Connect</h4>
+            <ul>
+              <li><a href="#!">Facebook: retrotopia_official_fb</a></li>
+              <li><a href="#!">Instagram: retrotopia@official</a></li>
+              <li><a href="#!">Twitter: retrotopia_official</a></li>
+              <li><a href="#!">LinkedIn: retrotopia-official</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span
+            >© <span data-year></span> Retrotopia Museum. All rights
+            reserved.</span
+          >
+          <div class="social-row">
+            <a href="#!" aria-label="Facebook">f</a>
+            <a href="#!" aria-label="Instagram">ig</a>
+            <a href="#!" aria-label="Twitter">tw</a>
+            <a href="#!" aria-label="LinkedIn">in</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+  </body>
 </html>

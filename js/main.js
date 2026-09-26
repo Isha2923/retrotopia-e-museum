@@ -1,4 +1,4 @@
-// RETROTOPIA — shared site behaviour
+// RETROTOPIA - shared site behaviour
 (function () {
   "use strict";
 
@@ -20,7 +20,7 @@
     });
   }
 
-  /* ---- language menu (cosmetic — display only) ---- */
+  /* ---- language menu (cosmetic - display only) ---- */
   var langSelect = document.querySelector(".lang-select");
   if (langSelect) {
     langSelect.querySelectorAll(".lang-menu button").forEach(function (btn) {
@@ -35,21 +35,31 @@
     });
   }
 
-  /* ---- display mode toggle (cosmetic switch, remembers choice) ---- */
+  /* ---- light / dark theme toggle ----
+     The <html> element already has data-theme set by a tiny inline
+     script in <head> on every page (reads localStorage before first
+     paint, so there's no flash of the wrong theme). This just wires
+     up the switch and keeps the choice in sync across pages. */
+  var THEME_KEY = "retrotopia-theme";
+  var root = document.documentElement;
   var modeSwitch = document.querySelector(".switch[data-mode-toggle]");
-  if (modeSwitch) {
-    var stored = localStorage.getItem("retrotopia-contrast") === "on";
-    setMode(stored);
-    modeSwitch.addEventListener("click", function () {
-      var next = modeSwitch.getAttribute("aria-pressed") !== "true";
-      setMode(next);
-      localStorage.setItem("retrotopia-contrast", next ? "on" : "off");
-    });
+
+  function applyTheme(theme) {
+    root.setAttribute("data-theme", theme);
+    if (modeSwitch)
+      modeSwitch.setAttribute(
+        "aria-pressed",
+        theme === "light" ? "true" : "false",
+      );
   }
-  function setMode(on) {
-    if (!modeSwitch) return;
-    modeSwitch.setAttribute("aria-pressed", on ? "true" : "false");
-    document.documentElement.classList.toggle("high-contrast", on);
+
+  if (modeSwitch) {
+    applyTheme(root.getAttribute("data-theme") || "dark");
+    modeSwitch.addEventListener("click", function () {
+      var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+      applyTheme(next);
+      localStorage.setItem(THEME_KEY, next);
+    });
   }
 
   /* ---- active nav link by current file ---- */
@@ -73,11 +83,15 @@
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.15 },
     );
-    revealEls.forEach(function (el) { io.observe(el); });
+    revealEls.forEach(function (el) {
+      io.observe(el);
+    });
   } else {
-    revealEls.forEach(function (el) { el.classList.add("in"); });
+    revealEls.forEach(function (el) {
+      el.classList.add("in");
+    });
   }
 
   /* ---- back to top ---- */
@@ -126,7 +140,9 @@
   if (chips.length && galleryItems.length) {
     chips.forEach(function (chip) {
       chip.addEventListener("click", function () {
-        chips.forEach(function (c) { c.classList.remove("is-active"); });
+        chips.forEach(function (c) {
+          c.classList.remove("is-active");
+        });
         chip.classList.add("is-active");
         var val = chip.dataset.filter;
         galleryItems.forEach(function (item) {
@@ -143,7 +159,8 @@
       e.preventDefault();
       var note = form.querySelector(".form-note");
       if (note) {
-        note.textContent = form.dataset.successMessage || "Thanks — we’ll be in touch shortly.";
+        note.textContent =
+          form.dataset.successMessage || "Thanks, we'll be in touch shortly.";
       }
       form.reset();
     });
