@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Gallery | Retrotopia</title>
+<meta name="description" content="Browse the Retrotopia gallery — exhibitions, artifacts, and the artisans behind every piece." />
+<link rel="shortcut icon" href="logo.jpeg" type="image/x-icon" />
+<link rel="stylesheet" href="css/theme.css" />
+<style>
+  .filter-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:40px;}
+  .chip{
+    padding:9px 20px;border-radius:999px;border:1px solid var(--border);
+    background:var(--navy-800);color:var(--text-muted);font-size:.85rem;font-weight:700;
+    transition:all .2s var(--ease);
+  }
+  .chip:hover{border-color:var(--accent-strong);color:var(--accent-strong);}
+  .chip.is-active{background:var(--gold-500);border-color:var(--gold-500);color:var(--navy-950);}
+
+  .masonry{
+    column-count:3;
+    column-gap:22px;
+  }
+  .masonry figure{
+    break-inside:avoid;
+    margin:0 0 22px;
+    border-radius:var(--radius-sm);
+    overflow:hidden;
+    position:relative;
+    border:1px solid var(--border);
+    background:var(--navy-800);
+    display:block;
+  }
+  .masonry figure img{width:100%;display:block;transition:transform .5s var(--ease);}
+  .masonry figure:hover img{transform:scale(1.05);}
+  .masonry figcaption{
+    position:absolute;left:0;right:0;bottom:0;
+    padding:26px 16px 14px;
+    background:linear-gradient(180deg,transparent,rgba(6,8,14,.92));
+    color:var(--ivory-100);font-size:.86rem;font-weight:600;
+    opacity:0;transform:translateY(6px);
+    transition:opacity .25s var(--ease),transform .25s var(--ease);
+  }
+  .masonry figure:hover figcaption{opacity:1;transform:translateY(0);}
+
+  @media (max-width:900px){ .masonry{column-count:2;} }
+  @media (max-width:560px){ .masonry{column-count:1;} }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="container">
+    <a href="index.html" class="brand">
+      <img src="logo.jpeg" alt="Retrotopia logo" />
+      <span class="brand-word">Retro<em>topia</em></span>
+    </a>
+    <nav class="main-nav" id="main-nav">
+      <a href="index.html">Home</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="tickets.html">Tickets &amp; Visit</a>
+      <a href="artandstories.html">Art &amp; Stories</a>
+      <a href="contactus.html">Contact Us</a>
+    </nav>
+    <div class="header-actions">
+      <details class="lang-select">
+        <summary>Language | <strong>ENG</strong> <span class="chev">▾</span></summary>
+        <div class="lang-menu">
+          <button data-code="ENG"><img src="Languages/USA.png" alt="">English</button>
+          <button data-code="FRA"><img src="Languages/France.webp" alt="">Français</button>
+          <button data-code="DEU"><img src="Languages/Germany.png" alt="">Deutsch</button>
+          <button data-code="ESP"><img src="Languages/Spain.webp" alt="">Español</button>
+        </div>
+      </details>
+      <button class="switch" data-mode-toggle aria-pressed="false" aria-label="Toggle high-contrast display mode"></button>
+      <a href="tickets.html" class="btn btn-primary" style="padding:10px 22px;">Buy Tickets</a>
+      <button class="nav-toggle" aria-expanded="false" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="page-banner">
+    <div class="container">
+      <span class="eyebrow">Our exhibition gallery</span>
+      <h1>A closer look at Retrotopia</h1>
+      <p>Every hall, artifact, and artisan captured in one place — filter by what you'd like to explore before your visit.</p>
+      <div class="crumb"><a href="index.html">Home</a> / Gallery</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="filter-row">
+        <button class="chip is-active" data-filter="all">All</button>
+        <button class="chip" data-filter="exhibitions">Exhibitions</button>
+        <button class="chip" data-filter="artifacts">Artifacts</button>
+        <button class="chip" data-filter="artisans">Artisans</button>
+      </div>
+
+      <div class="masonry">
+        <figure data-category="exhibitions">
+          <a href="Our Gallery/Img-1.jpg" data-lightbox data-caption="Main hall, opening night"><img src="Our Gallery/Img-1.jpg" alt="Main hall, opening night" loading="lazy" /></a>
+          <figcaption>Main hall — opening night</figcaption>
+        </figure>
+        <figure data-category="artifacts">
+          <a href="Our Gallery/Img-2.webp" data-lightbox data-caption="Restored ceramics wing"><img src="Our Gallery/Img-2.webp" alt="Restored ceramics wing" loading="lazy" /></a>
+          <figcaption>Restored ceramics wing</figcaption>
+        </figure>
+        <figure data-category="exhibitions">
+          <a href="Our Gallery/Img-3.jpg" data-lightbox data-caption="Sculpted Dreams installation"><img src="Our Gallery/Img-3.jpg" alt="Sculpted Dreams installation" loading="lazy" /></a>
+          <figcaption>Sculpted Dreams installation</figcaption>
+        </figure>
+        <figure data-category="artifacts">
+          <a href="Our Gallery/Img-4.jpg" data-lightbox data-caption="Bronze-age artifact display"><img src="Our Gallery/Img-4.jpg" alt="Bronze-age artifact display" loading="lazy" /></a>
+          <figcaption>Bronze-age artifact display</figcaption>
+        </figure>
+        <figure data-category="artisans">
+          <a href="Artisan/Artisan-1new.jpg" data-lightbox data-caption="An artisan at work in the craft wing"><img src="Artisan/Artisan-1new.jpg" alt="An artisan at work in the craft wing" loading="lazy" /></a>
+          <figcaption>An artisan at work in the craft wing</figcaption>
+        </figure>
+        <figure data-category="exhibitions">
+          <a href="Our Gallery/Img-5.jpg" data-lightbox data-caption="Antique Splendours corridor"><img src="Our Gallery/Img-5.jpg" alt="Antique Splendours corridor" loading="lazy" /></a>
+          <figcaption>Antique Splendours corridor</figcaption>
+        </figure>
+        <figure data-category="artifacts">
+          <a href="Our Gallery/Img-6.jpg" data-lightbox data-caption="Textile and weave collection"><img src="Our Gallery/Img-6.jpg" alt="Textile and weave collection" loading="lazy" /></a>
+          <figcaption>Textile and weave collection</figcaption>
+        </figure>
+        <figure data-category="artisans">
+          <a href="Artisan/Artisan-3.webp" data-lightbox data-caption="Hand-finishing a gilded piece"><img src="Artisan/Artisan-3.webp" alt="Hand-finishing a gilded piece" loading="lazy" /></a>
+          <figcaption>Hand-finishing a gilded piece</figcaption>
+        </figure>
+        <figure data-category="exhibitions">
+          <a href="Our Gallery/Img-7.avif" data-lightbox data-caption="Mystic Realms light installation"><img src="Our Gallery/Img-7.avif" alt="Mystic Realms light installation" loading="lazy" /></a>
+          <figcaption>Mystic Realms light installation</figcaption>
+        </figure>
+        <figure data-category="artifacts">
+          <a href="Our Gallery/Img-8.avif" data-lightbox data-caption="Stone carving fragment"><img src="Our Gallery/Img-8.avif" alt="Stone carving fragment" loading="lazy" /></a>
+          <figcaption>Stone carving fragment</figcaption>
+        </figure>
+        <figure data-category="exhibitions">
+          <a href="Our Gallery/Img-9.jpg" data-lightbox data-caption="Visitors exploring the east wing"><img src="Our Gallery/Img-9.jpg" alt="Visitors exploring the east wing" loading="lazy" /></a>
+          <figcaption>Visitors exploring the east wing</figcaption>
+        </figure>
+        <figure data-category="artifacts">
+          <a href="Our Gallery/Img-10.jpg" data-lightbox data-caption="Detail from the Gilded Treasures preview"><img src="Our Gallery/Img-10.jpg" alt="Detail from the Gilded Treasures preview" loading="lazy" /></a>
+          <figcaption>Detail from the Gilded Treasures preview</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="section alt">
+    <div class="container">
+      <div class="newsletter reveal">
+        <div class="newsletter-copy">
+          <span class="eyebrow">Plan ahead</span>
+          <h3>Ready to see it in person?</h3>
+          <p>Tickets are timed to keep every hall comfortable — book yours before the next exhibition sells out.</p>
+        </div>
+        <a href="tickets.html" class="btn btn-primary">Buy tickets</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div class="lightbox">
+  <button class="lightbox-close" aria-label="Close">✕</button>
+  <img src="" alt="" />
+  <p class="lightbox-cap"></p>
+</div>
+
+<a href="contactus.html" class="floating-btn" style="
+  position:fixed;bottom:24px;right:24px;z-index:90;
+  background:linear-gradient(135deg,var(--gold-400),var(--gold-600));
+  color:var(--navy-950);font-weight:700;font-size:.9rem;
+  padding:14px 26px;border-radius:999px;box-shadow:var(--shadow-gold);">Get in Touch</a>
+<button class="to-top" aria-label="Back to top">↑</button>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="index.html" class="brand">
+          <img src="logo.jpeg" alt="Retrotopia logo" />
+          <span class="brand-word">Retro<em>topia</em></span>
+        </a>
+        <p>A museum where futuristic vision meets timeless art — exhibitions, artisans, and stories worth the visit.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="tickets.html">Tickets &amp; Visit</a></li>
+          <li><a href="artandstories.html">Art &amp; Stories</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Visit</h4>
+        <ul>
+          <li><a href="tickets.html">Plan your visit</a></li>
+          <li><a href="tickets.html#hours">Hours &amp; location</a></li>
+          <li><a href="contactus.html">Contact us</a></li>
+          <li><a href="contactus.html#faq">FAQs</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="#!">Facebook — retrotopia_official_fb</a></li>
+          <li><a href="#!">Instagram — retrotopia@official</a></li>
+          <li><a href="#!">Twitter — retrotopia_official</a></li>
+          <li><a href="#!">LinkedIn — retrotopia-official</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span data-year></span> Retrotopia Museum. All rights reserved.</span>
+      <div class="social-row">
+        <a href="#!" aria-label="Facebook">f</a>
+        <a href="#!" aria-label="Instagram">ig</a>
+        <a href="#!" aria-label="Twitter">tw</a>
+        <a href="#!" aria-label="LinkedIn">in</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+</body>
+</html>
